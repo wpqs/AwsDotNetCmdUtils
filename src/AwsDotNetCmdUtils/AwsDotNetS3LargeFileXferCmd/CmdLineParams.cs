@@ -50,24 +50,24 @@ namespace AwsDotNetS3LargeFileXferCmd
                             argsForParam = GetArgsForParam(arg);
                         }
                     }
-                    if (argCount == argsForParam)
+                    if (argCount <= argsForParam)
                     {
-                        if (argCount > 0)
+                        if (arg.IndexOf("--") != 0)
+                        {
                             paramLine += " " + arg;
-                        if (ProcParam(paramLine) == false)
-                            break;
+                            argCount++;
+                        }
+                        if (argCount == argsForParam)
+                        {
+                            if (ProcParam(paramLine) == false)
+                                break;
+                        }
                     }
-                    else if (argCount > argsForParam)
+                    if (argCount > argsForParam)
                     {
-                        SetErrorMsg($"Too many arguments for parameter {paramName} {Environment.NewLine}{GetParamHelp()}");
+                        SetErrorMsg($"Too many arguments for parameter {paramLine} {Environment.NewLine}{GetParamHelp()}");
                         break;
                     }
-                    else
-                    {
-                        if (argCount > 0)
-                            paramLine += " " + arg;
-                    }
-                    argCount++;
                 }
                 if (IsError == false)
                     ValidateParams();
