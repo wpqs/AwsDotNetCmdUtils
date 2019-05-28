@@ -18,11 +18,11 @@ Run Information
 	bucket name, region name
 	record key and secret key needed to access it (best to create AIM keys rather than use root keys)
 2. open a Command Prompt window and issue the following commands:
-    a. cd c:\users\wills\AwsDotNetCmdUtils
-    b. aws config
-	     (enter region name and keys when prompted)
-    c. dotnet AwsDotNetS3LargeFileXferCmd --operation upload --inputfile c:\users\wills\largefile.bin --bucketname novastor-nuc-test --bucketregion us-east-1
-	   dotnet AwsDotNetS3LargeFileXferCmd --operation download --outputfile c:\users\wills\largefile.bin --bucketname novastor-nuc-test --bucketregion us-east-1
+  * cd c:\users\wills\AwsDotNetCmdUtils
+  * aws config
+     (enter region name and keys when prompted)
+  * dotnet AwsDotNetS3LargeFileXferCmd --operation upload --inputfile c:\users\wills\largefile.bin --bucketname novastor-nuc-test --bucketregion us-east-1
+  * dotnet AwsDotNetS3LargeFileXferCmd --operation download --outputfile c:\users\wills\largefile.bin --bucketname novastor-nuc-test --bucketregion us-east-1
 
 Build Information
 -----------------
