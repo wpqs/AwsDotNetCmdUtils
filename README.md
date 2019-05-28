@@ -1,5 +1,7 @@
 # AwsDotNetCmdUtils
-Collection of .NET command line utilities for Amazon Web Services
+Collection of .NET command line utilities for Amazon Web Services:
+* AwsDotNetS3LargeFileXferCmd
+
 
 Installation on host computer
 =============================
