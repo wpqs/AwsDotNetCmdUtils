@@ -95,7 +95,12 @@ namespace AwsDotNetS3LargeFileXferCmd
             {
                 var s3Client = new AmazonS3Client(RegionEndpoint.GetBySystemName(cmdLineParams.BucketRegion));
 
-                var fileTransferUtility = new TransferUtility(s3Client);
+                var config = new TransferUtilityConfig
+                {
+                    MinSizeBeforePartUpload = cmdLineParams.PartialSize,
+                    ConcurrentServiceRequests = cmdLineParams.Threads
+                };
+                var fileTransferUtility = new TransferUtility(s3Client, config);
 
                 var fileTransferRequest = new TransferUtilityDownloadRequest
                 {
@@ -125,7 +130,12 @@ namespace AwsDotNetS3LargeFileXferCmd
                 {
                     var s3Client = new AmazonS3Client(RegionEndpoint.GetBySystemName(cmdLineParams.BucketRegion));
 
-                    var fileTransferUtility = new TransferUtility(s3Client);
+                    var config = new TransferUtilityConfig
+                    {
+                        MinSizeBeforePartUpload = cmdLineParams.PartialSize, 
+                        ConcurrentServiceRequests = cmdLineParams.Threads 
+                    };
+                    var fileTransferUtility = new TransferUtility(s3Client, config);
 
                     await fileTransferUtility.UploadAsync(cmdLineParams.InputFile, cmdLineParams.BucketName);
                 }

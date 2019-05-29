@@ -6,6 +6,7 @@ namespace AwsDotNetS3LargeFileXferCmd
 {
     public abstract class CmdLineParams
     {
+        protected abstract void SetDefaultValues();
         protected abstract bool ProcParam(string paramLine);
         protected abstract string GetParamHelp(int paramId = 0);
         protected abstract void ValidateParams();
@@ -22,7 +23,8 @@ namespace AwsDotNetS3LargeFileXferCmd
 
         protected CmdLineParams(string[] args =null)
         {
-            IsError = false;
+            SetDefaultValues();
+
             if ((args == null) || (args.Length < 1))
                 SetErrorMsg($"Error: Command line has no parameters {Environment.NewLine}{GetParamHelp()}");
             else

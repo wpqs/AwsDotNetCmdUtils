@@ -14,13 +14,23 @@ namespace AwsDotNetS3LargeFileXferCmd
         public static readonly string OpValueDownload = "download";
         public static readonly string BucketNameParam = "--bucketname";
         public static readonly string BucketRegionParam = "--bucketregion";
-
+        public static readonly string ThreadsParam = "--threads";
+        public static readonly int    ThreadsValueDefault = 10;
+        public static readonly int    ThreadsValueMin = 1;
+        public static readonly int    ThreadsValueMax = 100;
+        public static readonly string PartialSizeParam = "--partialsize";
+        public static readonly long PartialSizeValueDefault = 16777216; //2**24
+        public static readonly long PartialSizeValueMin = 4096;         //2**12
+        public static readonly long PartialSizeValueMax = 4294967296;   //2**32
 
         public OpMode Op { private set; get; }
         public string InputFile { private set; get; }
         public string OutputFile { private set; get; }
         public string BucketName { private set; get; }
         public string BucketRegion { private set; get; }
+        public int Threads { private set; get; }
+        public long PartialSize { private set; get; }
+
 
         private enum Param
         {
@@ -28,6 +38,8 @@ namespace AwsDotNetS3LargeFileXferCmd
             Op,
             BucketRegion,
             BucketName,
+            Threads,
+            PartialSize,
             Unknown
         }
 
@@ -40,6 +52,13 @@ namespace AwsDotNetS3LargeFileXferCmd
 
         public CmdLineParamsProc(string[] cmdLine = null) : base(cmdLine)
         {
+        }
+
+        protected override void SetDefaultValues()  //called from base class as values may be overwritten by values passed from cmdLine
+        {
+            IsError = false;
+            Threads = ThreadsValueDefault;
+            PartialSize = PartialSizeValueDefault;
         }
 
         protected override bool ProcParam(string paramLine)
@@ -69,7 +88,7 @@ namespace AwsDotNetS3LargeFileXferCmd
                         {
                             OutputFile = GetArgValue(paramLine, 2);
                             if (string.IsNullOrEmpty(OutputFile))
-                                SetErrorMsg($"Error: Parameter value is null or empty {Environment.NewLine}{GetParamHelp((int)Param.Op)}");
+                                SetErrorMsg($"Error: Second argument value in {paramLine} is empty or missing {Environment.NewLine}{GetParamHelp((int)Param.Op)}");
                             else
                             {
                                 Op = OpMode.Download;
@@ -80,7 +99,7 @@ namespace AwsDotNetS3LargeFileXferCmd
                         {
                             InputFile = GetArgValue(paramLine, 2);
                             if (string.IsNullOrEmpty(InputFile))
-                                SetErrorMsg($"Error: Parameter value is null or empty {Environment.NewLine}{GetParamHelp((int)Param.Op)}");
+                                SetErrorMsg($"Error: Second argument value in {paramLine} is empty or missing {Environment.NewLine}{GetParamHelp((int)Param.Op)}");
                             else
                             {
                                 Op = OpMode.Upload;
@@ -88,7 +107,7 @@ namespace AwsDotNetS3LargeFileXferCmd
                             }
                         }
                         else
-                            SetErrorMsg($"Error: Invalid argument {value} found in {paramLine}{Environment.NewLine}{GetParamHelp((int) Param.Op)}");
+                            SetErrorMsg($"Error: First argument value in {paramLine} is invalid; {value}{Environment.NewLine}{GetParamHelp((int) Param.Op)}");
                     }
                 }
                 break;
@@ -96,12 +115,12 @@ namespace AwsDotNetS3LargeFileXferCmd
                 {
                     int argCnt = GetArgCount(paramLine);
                     if (argCnt != 1)
-                        SetErrorMsg($"Error: Incorrect number of arguments for parameter {paramLine}, found {argCnt} should be 1 {Environment.NewLine}{GetParamHelp((int)Param.BucketRegion)}");
+                        SetErrorMsg($"Error: Incorrect number of arguments in parameter {paramLine}, found {argCnt} should be 1 {Environment.NewLine}{GetParamHelp((int)Param.BucketRegion)}");
                     else
                     {
                         BucketRegion = GetArgValue(paramLine, 1);
                         if (string.IsNullOrEmpty(BucketRegion))
-                            SetErrorMsg($"Error: Parameter value is null or empty {Environment.NewLine}{GetParamHelp((int) Param.BucketRegion)}");
+                            SetErrorMsg($"Error: First argument value in {paramLine} is null or empty {Environment.NewLine}{GetParamHelp((int) Param.BucketRegion)}");
                         else
                             rc = true;
                     }
@@ -111,14 +130,62 @@ namespace AwsDotNetS3LargeFileXferCmd
                 {
                     int argCnt = GetArgCount(paramLine);
                     if (argCnt != 1)
-                        SetErrorMsg($"Error: Incorrect number of arguments for parameter {paramLine}, found {argCnt} should be 1 {Environment.NewLine}{GetParamHelp((int)Param.BucketName)}");
+                        SetErrorMsg($"Error: Incorrect number of arguments in {paramLine}, found {argCnt} should be 1 {Environment.NewLine}{GetParamHelp((int)Param.BucketName)}");
                     else
                     {
                         BucketName = GetArgValue(paramLine, 1);
                         if (string.IsNullOrEmpty(BucketName))
-                            SetErrorMsg($"Error: Parameter value is null or empty {Environment.NewLine}{GetParamHelp((int) Param.BucketName)}");
+                            SetErrorMsg($"Error: First argument value in {paramLine} is null or empty {Environment.NewLine}{GetParamHelp((int) Param.BucketName)}");
                         else
                             rc = true;
+                    }
+                }
+                break;
+                case Param.Threads:
+                {
+                    int argCnt = GetArgCount(paramLine);
+                    if (argCnt != 1)
+                        SetErrorMsg($"Error: Incorrect number of arguments for parameter {paramLine}, found {argCnt} should be 1 {Environment.NewLine}{GetParamHelp((int)Param.Threads)}");
+                    else
+                    {
+                        var threadsCount = GetArgValue(paramLine, 1);
+                        if (string.IsNullOrEmpty(threadsCount))
+                            SetErrorMsg($"Error: Argument value in {paramLine} is null or empty {Environment.NewLine}{GetParamHelp((int)Param.Threads)}");
+                        else
+                        {
+                            int threadCnt = 0;
+                            if (Int32.TryParse(threadsCount, out threadCnt) == false)
+                                SetErrorMsg($"Error: Parameter value {threadsCount} is not a valid number {Environment.NewLine}{GetParamHelp((int)Param.Threads)}");
+                            else
+                            {
+                                Threads = threadCnt;
+                                rc = true;
+                            }
+                        }
+                    }
+                }
+                break;
+                case Param.PartialSize:
+                {
+                    int argCnt = GetArgCount(paramLine);
+                    if (argCnt != 1)
+                        SetErrorMsg($"Error: Incorrect number of arguments for parameter {paramLine}, found {argCnt} should be 1 {Environment.NewLine}{GetParamHelp((int)Param.PartialSize)}");
+                    else
+                    {
+                        var partialSize = GetArgValue(paramLine, 1);
+                        if (string.IsNullOrEmpty(partialSize))
+                            SetErrorMsg($"Error: Argument value in {paramLine} is null or empty {Environment.NewLine}{GetParamHelp((int)Param.PartialSize)}");
+                        else
+                        {
+                            long size = 0L;
+                            if (long.TryParse(partialSize, out size) == false)
+                                SetErrorMsg($"Error: Parameter value {partialSize} is not a valid number {Environment.NewLine}{GetParamHelp((int)Param.PartialSize)}");
+                            else
+                            {
+                                PartialSize = size;
+                                rc = true;
+                            }
+                        }
                     }
                 }
                 break;
@@ -135,27 +202,43 @@ namespace AwsDotNetS3LargeFileXferCmd
         {
             IsError = false;
 
-            if (string.IsNullOrEmpty(BucketRegion))
-                SetErrorMsg($"Error: Missing {BucketRegionParam}{Environment.NewLine}{GetParamHelp((int)Param.BucketRegion)}");
+            if ((Threads < ThreadsValueMin) || (Threads > ThreadsValueMax))
+                SetErrorMsg($"Error: {ThreadsParam} value {Threads.ToString()} is invalid {Environment.NewLine}{GetParamHelp((int)Param.Threads)}");
             else
             {
-                if (string.IsNullOrEmpty(BucketName))
-                    SetErrorMsg($"Error: Missing {BucketNameParam}{Environment.NewLine}{GetParamHelp((int)Param.BucketName)}");
+                if ((PartialSize < PartialSizeValueMin) || (PartialSize > PartialSizeValueMax))
+                    SetErrorMsg($"Error: {PartialSizeParam} value {PartialSize.ToString()} is invalid {Environment.NewLine}{GetParamHelp((int)Param.PartialSize)}");
                 else
                 {
-                    if (Op == OpMode.Download)
-                    {
-                        if (string.IsNullOrEmpty(OutputFile))
-                            SetErrorMsg($"Error: Filename argument missing{Environment.NewLine}{GetParamHelp((int) Param.Op)}");
-                    }
-                    else if (Op == OpMode.Upload)
-                    {
-                        if (string.IsNullOrEmpty(InputFile))
-                            SetErrorMsg($"Error: Filename argument missing{Environment.NewLine}{GetParamHelp((int) Param.Op)}");
-                    }
+                    if (string.IsNullOrEmpty(BucketRegion))
+                        SetErrorMsg(
+                            $"Error: Missing {BucketRegionParam}{Environment.NewLine}{GetParamHelp((int) Param.BucketRegion)}");
                     else
                     {
-                        SetErrorMsg($"Error: Missing {OpParam}{Environment.NewLine}{GetParamHelp((int) Param.Op)}");
+                        if (string.IsNullOrEmpty(BucketName))
+                            SetErrorMsg(
+                                $"Error: Missing {BucketNameParam}{Environment.NewLine}{GetParamHelp((int) Param.BucketName)}");
+                        else
+                        {
+
+                            if (Op == OpMode.Download)
+                            {
+                                if (string.IsNullOrEmpty(OutputFile))
+                                    SetErrorMsg(
+                                        $"Error: Filename argument missing{Environment.NewLine}{GetParamHelp((int) Param.Op)}");
+                            }
+                            else if (Op == OpMode.Upload)
+                            {
+                                if (string.IsNullOrEmpty(InputFile))
+                                    SetErrorMsg(
+                                        $"Error: Filename argument missing{Environment.NewLine}{GetParamHelp((int) Param.Op)}");
+                            }
+                            else
+                            {
+                                SetErrorMsg(
+                                    $"Error: Missing {OpParam}{Environment.NewLine}{GetParamHelp((int) Param.Op)}");
+                            }
+                        }
                     }
                 }
             }
@@ -173,6 +256,9 @@ namespace AwsDotNetS3LargeFileXferCmd
                 rc += $"{BucketNameParam} name ";
                 rc += $"{OpParam} [{OpValueUpload} 'drive:path\\filename'";
                 rc += $" | {OpValueDownload} 'drive:path\\filename']";
+                rc += Environment.NewLine;
+                rc += $"({ThreadsParam} {ThreadsValueDefault.ToString()} <min {ThreadsValueMin} max {ThreadsValueMax}>) ";
+                rc += $"({PartialSizeParam} {PartialSizeValueDefault.ToString()} <min {PartialSizeValueMin} max {PartialSizeValueMax}> )";
                 rc += GetHelpNotes();
 
             }
@@ -192,6 +278,18 @@ namespace AwsDotNetS3LargeFileXferCmd
             {
                 rc = $"{Environment.NewLine}Hint: retry using expected argument for the parameter.{Environment.NewLine}";
                 rc += $"{BucketNameParam} name";
+                rc += GetHelpNotes();
+            }
+            else if (help == Param.Threads)
+            {
+                rc = $"{Environment.NewLine}Hint: retry using expected argument for the parameter.{Environment.NewLine}";
+                rc += $"{ThreadsParam} {ThreadsValueDefault} <min {ThreadsValueMin} max {ThreadsValueMax}>";
+                rc += GetHelpNotes();
+            }
+            else if (help == Param.PartialSize)
+            {
+                rc = $"{Environment.NewLine}Hint: retry using expected argument for the parameter.{Environment.NewLine}";
+                rc += $"{PartialSizeParam} {PartialSizeValueDefault} <min {PartialSizeValueMin} max {PartialSizeValueMax}>";
                 rc += GetHelpNotes();
             }
             else
@@ -215,6 +313,8 @@ namespace AwsDotNetS3LargeFileXferCmd
             rc += Environment.NewLine;
             rc += "   (--c ...) means parameter c is optional. --c 1 (2) means argument 2 is optional";
             rc += Environment.NewLine;
+            rc += "   --d 5 <min 0 max 10> means argument for parameter d is a number in range 0-10 with a default value of 5";
+            rc += Environment.NewLine;
 
             return rc;
         }
@@ -232,6 +332,10 @@ namespace AwsDotNetS3LargeFileXferCmd
                 rc = Param.BucketRegion;
             else if (param == BucketNameParam)
                 rc = Param.BucketName;
+            else if (param == ThreadsParam)
+                rc = Param.Threads;
+            else if (param == PartialSizeParam)
+                rc = Param.PartialSize;
             else if (param == HelpParam)
                 rc = Param.Help;
             else
