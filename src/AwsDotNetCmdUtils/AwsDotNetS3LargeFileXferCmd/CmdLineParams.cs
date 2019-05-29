@@ -6,11 +6,9 @@ namespace AwsDotNetS3LargeFileXferCmd
 {
     public abstract class CmdLineParams
     {
-        protected abstract bool ProcParam(string param);
-        protected abstract int GetArgsForParam(string arg);
+        protected abstract bool ProcParam(string paramLine);
         protected abstract string GetParamHelp(int paramId = 0);
         protected abstract void ValidateParams();
-
 
         public bool IsError { get; protected set; }
 
@@ -26,47 +24,21 @@ namespace AwsDotNetS3LargeFileXferCmd
         {
             IsError = false;
             if ((args == null) || (args.Length < 1))
-                SetErrorMsg($"Command line has no parameters {Environment.NewLine}{GetParamHelp()}");
+                SetErrorMsg($"Error: Command line has no parameters {Environment.NewLine}{GetParamHelp()}");
             else
             {
-                var paramLine = "";
-                var paramName = "";
-                var argsForParam = 0;
-                var argCount = 0;
+                string cmdLine = "";
                 foreach (var arg in args)
+                    cmdLine += arg + " ";
+                cmdLine = cmdLine.TrimEnd();
+
+                var paramList = cmdLine.Split("--");
+                foreach (var param in paramList)
                 {
-                    if (arg.IndexOf("--") == 0)
+                    if (string.IsNullOrWhiteSpace(param) == false)
                     {
-                        if (argCount < argsForParam)
-                        {
-                            SetErrorMsg($"Too few arguments for parameter {paramName} {Environment.NewLine}{GetParamHelp()}");
+                        if (ProcParam("--" + param.TrimEnd()) == false)
                             break;
-                        }
-                        else
-                        {
-                            argCount = 0;
-                            paramName = arg;
-                            paramLine = paramName;
-                            argsForParam = GetArgsForParam(arg);
-                        }
-                    }
-                    if (argCount <= argsForParam)
-                    {
-                        if (arg.IndexOf("--") != 0)
-                        {
-                            paramLine += " " + arg;
-                            argCount++;
-                        }
-                        if (argCount == argsForParam)
-                        {
-                            if (ProcParam(paramLine) == false)
-                                break;
-                        }
-                    }
-                    if (argCount > argsForParam)
-                    {
-                        SetErrorMsg($"Too many arguments for parameter {paramLine} {Environment.NewLine}{GetParamHelp()}");
-                        break;
                     }
                 }
                 if (IsError == false)
@@ -74,16 +46,36 @@ namespace AwsDotNetS3LargeFileXferCmd
             }
         }
 
-        protected string GetParamValue(string param)
+        protected string GetArgValue(string paramLine, int argNumber=1)
         {
-            string rc = "";
-            if (param != null)
+            string rc = null;
+            if (paramLine != null)
             {
-                int offset = param.IndexOf(' ');
-                if ((offset >= 0) && (param.Length > offset +1))
+                int count = 0;
+                int offset = 0;
+                while ((offset = paramLine.IndexOf(' ', offset)) != -1)
                 {
-                    rc = param.Substring(offset + 1);
+                    if ((++count == argNumber) && (paramLine.Length > offset + 1))
+                    {
+                        var argument = paramLine.Substring(offset + 1).TrimStart();
+                        var end = argument.IndexOf(' ');
+                        rc = end == -1 ? argument : argument.Substring(0, end);
+                        break;
+                    }
+                    offset++;
                 }
+            }
+            return rc;
+        }
+
+        protected int GetArgCount(string paramLine)
+        {
+            int rc = 0;
+            int offset = 0;
+            while ((offset = paramLine.IndexOf(' ', offset)) != -1)
+            {
+                rc++;
+                offset++;
             }
             return rc;
         }

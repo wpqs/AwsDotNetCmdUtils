@@ -15,12 +15,12 @@ namespace AwsDotNetS3LargeFileXferCmd
         {
             int rc = -1;
 
-            Console.WriteLine($"AwsDotNetS3LargeFileXferCmd {GetVersion()}");
+            Console.WriteLine($"AwsDotNetS3LargeFileXferCmd {GetVersion()}.{Environment.NewLine}Copyright 2019 Will Stott.{Environment.NewLine}Use subject to standard MIT License - see https://github.com/wpqs/AwsDotNetCmdUtils {Environment.NewLine}");
 
             DateTime tim = DateTime.UtcNow;
             var cmdLineParams = new CmdLineParamsProc(args);
             if (cmdLineParams.IsError)
-                Console.WriteLine(cmdLineParams.GetErrorMsg());
+                Console.WriteLine($"{cmdLineParams.GetErrorMsg()}");
             else
             {
                 string errMsg = null;
@@ -46,7 +46,7 @@ namespace AwsDotNetS3LargeFileXferCmd
             if (rc == 0)
                  Console.WriteLine("{0}",GetJobDetails(cmdLineParams, elapsed));
 
-            Console.WriteLine((rc == 0) ? "ends" : "abends");
+            Console.WriteLine((rc == 0) ? $"program ends : return code {rc}" : $"program abends: return code {rc}");
             return rc;
         }
 
@@ -83,6 +83,7 @@ namespace AwsDotNetS3LargeFileXferCmd
             {
                 rc = "details of operation not yet supported";
             }
+            rc += Environment.NewLine;
             return rc;
         }
 

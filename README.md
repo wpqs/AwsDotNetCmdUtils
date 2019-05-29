@@ -7,7 +7,10 @@ Installation on host computer
 =============================
 1. .NET Core 2.2 - download runtime 2.2.5 from https://dotnet.microsoft.com/download/dotnet-core/2.2
 2. AwsDotNetCmdUtils - download release ZIP file from GitHub and extract to a suitable directory on your PC - i.e. C:\Program Files (x86)\wpqs\AwsDotNetCmdUtils
-3. AWS CLI - download the Amazon CLI for Windows (64-bit) from https://docs.aws.amazon.com/cli/latest/userguide/install-windows.html
+3. Add install directory to your PC's PATH environmental variable (open Control Panel and search for Path)
+4. AWS CLI - download the Amazon CLI for Windows (64-bit) from https://docs.aws.amazon.com/cli/latest/userguide/install-windows.html
+5. Create a test file called largefile.bin (500MB) in a suitable directory on your PC - i.e. c:\users\wills\
+	fsutil file createnew largefile.bin 524288000
 
 AwsDotNetS3LargeFileXferCmd
 ===========================

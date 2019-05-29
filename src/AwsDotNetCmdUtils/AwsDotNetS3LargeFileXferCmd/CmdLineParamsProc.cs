@@ -8,15 +8,13 @@ namespace AwsDotNetS3LargeFileXferCmd
 {
     public class CmdLineParamsProc : CmdLineParams
     {
-        public static readonly string OpParam = "--operation";
-        public static readonly string InputFileParam = "--inputfile";
-        public static readonly string OutputFileParam = "--outputfile";
-        public static readonly string BucketNameParam = "--bucketname";
-        public static readonly string BucketRegionParam = "--bucketregion";
         public static readonly string HelpParam = "--help";
-
+        public static readonly string OpParam = "--operation";
         public static readonly string OpValueUpload = "upload";
         public static readonly string OpValueDownload = "download";
+        public static readonly string BucketNameParam = "--bucketname";
+        public static readonly string BucketRegionParam = "--bucketregion";
+
 
         public OpMode Op { private set; get; }
         public string InputFile { private set; get; }
@@ -30,8 +28,6 @@ namespace AwsDotNetS3LargeFileXferCmd
             Op,
             BucketRegion,
             BucketName,
-            InputFile,
-            OutputFile,
             Unknown
         }
 
@@ -46,104 +42,120 @@ namespace AwsDotNetS3LargeFileXferCmd
         {
         }
 
-        protected override bool ProcParam(string param)
+        protected override bool ProcParam(string paramLine)
         {
             bool rc = false;
 
-            switch (GetParamType(param))
+            switch (GetParamType(paramLine))
             {
                 case Param.Help:
                 {
-                    SetErrorMsg(GetParamHelp((int) Param.Help));
+                    int argCnt = GetArgCount(paramLine);
+                    if (argCnt != 0)
+                        SetErrorMsg($"Error: Incorrect number of arguments for parameter, found {argCnt} should be 0.{Environment.NewLine}{GetParamHelp((int)Param.Help)}");
+                    else
+                        SetErrorMsg($"Help request:{Environment.NewLine}{GetParamHelp((int) Param.Help)}");
                 }
                 break;
                 case Param.Op:
                 {
-                    var value = GetParamValue(param).ToLower();
-                    if (value == OpValueDownload)
-                    {
-                        Op = OpMode.Download;
-                        rc = true;
-                    }
-                    else if (value == OpValueUpload)
-                    {
-                        Op = OpMode.Upload;
-                        rc = true;
-                    }
+                    int argCnt = GetArgCount(paramLine);
+                    if (argCnt != 2)
+                        SetErrorMsg($"Error: Incorrect number of arguments for parameter, found {argCnt} should be 2.{Environment.NewLine}{paramLine}{Environment.NewLine}{GetParamHelp((int)Param.Op)}");
                     else
-                        SetErrorMsg($"invalid value for parameter {value}{Environment.NewLine}{GetParamHelp((int)Param.Op)}");
+                    {
+                        var value = GetArgValue(paramLine, 1)?.ToLower() ?? "[not found]";
+                        if (value == OpValueDownload)
+                        {
+                            OutputFile = GetArgValue(paramLine, 2);
+                            if (string.IsNullOrEmpty(OutputFile))
+                                SetErrorMsg($"Error: Parameter value is null or empty {Environment.NewLine}{GetParamHelp((int)Param.Op)}");
+                            else
+                            {
+                                Op = OpMode.Download;
+                                rc = true;
+                            }
+                        }
+                        else if (value == OpValueUpload)
+                        {
+                            InputFile = GetArgValue(paramLine, 2);
+                            if (string.IsNullOrEmpty(InputFile))
+                                SetErrorMsg($"Error: Parameter value is null or empty {Environment.NewLine}{GetParamHelp((int)Param.Op)}");
+                            else
+                            {
+                                Op = OpMode.Upload;
+                                rc = true;
+                            }
+                        }
+                        else
+                            SetErrorMsg($"Error: Invalid argument {value} found in {paramLine}{Environment.NewLine}{GetParamHelp((int) Param.Op)}");
+                    }
                 }
                 break;
                 case Param.BucketRegion:
                 {
-                    BucketRegion = GetParamValue(param);
-                    if (string.IsNullOrEmpty(BucketRegion))
-                        SetErrorMsg($"parameter value is null or empty {Environment.NewLine}{GetParamHelp((int)Param.BucketRegion)}");
+                    int argCnt = GetArgCount(paramLine);
+                    if (argCnt != 1)
+                        SetErrorMsg($"Error: Incorrect number of arguments for parameter {paramLine}, found {argCnt} should be 1 {Environment.NewLine}{GetParamHelp((int)Param.BucketRegion)}");
                     else
-                        rc = true;
+                    {
+                        BucketRegion = GetArgValue(paramLine, 1);
+                        if (string.IsNullOrEmpty(BucketRegion))
+                            SetErrorMsg($"Error: Parameter value is null or empty {Environment.NewLine}{GetParamHelp((int) Param.BucketRegion)}");
+                        else
+                            rc = true;
+                    }
                 }
                     break;
                 case Param.BucketName:
                 {
-                    BucketName = GetParamValue(param);
-                    if (string.IsNullOrEmpty(BucketName))
-                        SetErrorMsg($"parameter value is null or empty {Environment.NewLine}{GetParamHelp((int) Param.BucketName)}");
+                    int argCnt = GetArgCount(paramLine);
+                    if (argCnt != 1)
+                        SetErrorMsg($"Error: Incorrect number of arguments for parameter {paramLine}, found {argCnt} should be 1 {Environment.NewLine}{GetParamHelp((int)Param.BucketName)}");
                     else
-                        rc = true;
-                }
-                break;
-                case Param.InputFile:
-                {
-                    InputFile = GetParamValue(param);
-                    if (string.IsNullOrEmpty(InputFile))
-                        SetErrorMsg($"parameter value is null or empty {Environment.NewLine}{GetParamHelp((int)Param.InputFile)}");
-                    else
-                        rc = true;
-                }
-                break;
-                case Param.OutputFile:
-                {
-                    OutputFile = GetParamValue(param);
-                    if (string.IsNullOrEmpty(OutputFile))
-                        SetErrorMsg($"parameter value is null or empty {Environment.NewLine}{GetParamHelp((int)Param.OutputFile)}");
-                    else
-                        rc = true;
+                    {
+                        BucketName = GetArgValue(paramLine, 1);
+                        if (string.IsNullOrEmpty(BucketName))
+                            SetErrorMsg($"Error: Parameter value is null or empty {Environment.NewLine}{GetParamHelp((int) Param.BucketName)}");
+                        else
+                            rc = true;
+                    }
                 }
                 break;
                 default: //case Param.Unknown:
                 {
-                    SetErrorMsg($"Unknown parameter {param}{Environment.NewLine}{GetParamHelp()}");
+                    SetErrorMsg($"Error: Unknown parameter {paramLine}{Environment.NewLine}{GetParamHelp()}");
                 }
                 break;
             }
-
             return rc;
         }
+
         protected override void ValidateParams()
         {
             IsError = false;
 
             if (string.IsNullOrEmpty(BucketRegion))
-                SetErrorMsg($"missing {BucketRegionParam}{Environment.NewLine}{GetParamHelp((int)Param.BucketRegion)}");
+                SetErrorMsg($"Error: Missing {BucketRegionParam}{Environment.NewLine}{GetParamHelp((int)Param.BucketRegion)}");
             else
             {
                 if (string.IsNullOrEmpty(BucketName))
-                    SetErrorMsg($"missing {BucketNameParam}{Environment.NewLine}{GetParamHelp((int)Param.BucketName)}");
+                    SetErrorMsg($"Error: Missing {BucketNameParam}{Environment.NewLine}{GetParamHelp((int)Param.BucketName)}");
                 else
                 {
                     if (Op == OpMode.Download)
                     {
                         if (string.IsNullOrEmpty(OutputFile))
-                            SetErrorMsg($"missing {OutputFileParam}{Environment.NewLine}{GetParamHelp((int) Param.OutputFile)}");
+                            SetErrorMsg($"Error: Filename argument missing{Environment.NewLine}{GetParamHelp((int) Param.Op)}");
                     }
                     else if (Op == OpMode.Upload)
                     {
                         if (string.IsNullOrEmpty(InputFile))
-                            SetErrorMsg($"missing {InputFileParam}{Environment.NewLine}{GetParamHelp((int) Param.InputFile)}");
+                            SetErrorMsg($"Error: Filename argument missing{Environment.NewLine}{GetParamHelp((int) Param.Op)}");
                     }
                     else
                     {
-                        SetErrorMsg($"missing {OpParam}{Environment.NewLine}{GetParamHelp((int) Param.Op)}");
+                        SetErrorMsg($"Error: Missing {OpParam}{Environment.NewLine}{GetParamHelp((int) Param.Op)}");
                     }
                 }
             }
@@ -155,59 +167,55 @@ namespace AwsDotNetS3LargeFileXferCmd
             Param help = (Param)paramId;
             if (help == Param.Help)
             {
-                rc = "hint expected params: ";
-                rc += $"{OpParam} {OpValueUpload} | {OpValueDownload} ";
+                rc = $"{Environment.NewLine}Hint: retry using program's expected parameters and their arguments which are:";
+                rc += Environment.NewLine;
                 rc += $"{BucketRegionParam} us-east-1 ";
                 rc += $"{BucketNameParam} name ";
-                rc += $"{InputFileParam} 'drive:path\\filename' ";
-                rc += " | ";
-                rc += $"{OutputFileParam} 'drive:path\\filename' ";
+                rc += $"{OpParam} [{OpValueUpload} 'drive:path\\filename'";
+                rc += $" | {OpValueDownload} 'drive:path\\filename']";
+                rc += GetHelpNotes();
+
             }
             else if (help == Param.Op)
             {
-                rc = "hint expected param: ";
-                rc += $"{OpParam} {OpValueUpload} | {OpValueDownload} ";
+                rc = $"{Environment.NewLine}Hint: retry using expected arguments for the parameter.{Environment.NewLine}";
+                rc += $"{OpParam} [{OpValueUpload} 'drive:path\\filename' | {OpValueDownload} 'drive:path\\filename']";
+                rc += GetHelpNotes();
             }
             else if (help == Param.BucketRegion)
             {
-                rc = "hint expected param: ";
+                rc = $"{Environment.NewLine}Hint: retry using expected argument for the parameter.{Environment.NewLine}";
                 rc += $"{BucketRegionParam} us-east-1";
+                rc += GetHelpNotes();
             }
             else if (help == Param.BucketName)
             {
-                rc = "hint expected param: ";
+                rc = $"{Environment.NewLine}Hint: retry using expected argument for the parameter.{Environment.NewLine}";
                 rc += $"{BucketNameParam} name";
-            }
-            else if (help == Param.InputFile)
-            {
-                rc = "hint expected param: ";
-                rc += $"{InputFileParam} 'drive:path\\filename' ";
-            }
-            else if (help == Param.OutputFile)
-            {
-                rc = "hint expected param: ";
-                rc += $"{OutputFileParam} 'drive:path\\filename' ";
+                rc += GetHelpNotes();
             }
             else
             {
-                rc = "hint param is unknown";
+                rc = $"{Environment.NewLine}Program error: please report this problem";
             }
             return rc;
         }
 
-        protected override int GetArgsForParam(string arg)
+        private string GetHelpNotes()
         {
-            int rc = 0;
+            string rc = "";
 
-            switch (GetParamType(arg))
-            {
-                case Param.Help:
-                    rc = 0;
-                break;
-                default:
-                    rc = 1;
-                break;
-            }
+            rc += Environment.NewLine;
+            rc += Environment.NewLine;
+            rc += "Notes:";
+            rc += Environment.NewLine;
+            rc += "   --a 1 2 3 means parameter 'a' with arguments 1, 2 and 3.";
+            rc += Environment.NewLine;
+            rc += "   [--a ... | --b ...] means enter either parameter a or b. --a [1 ... | 2 ...] means enter either argument 1 or 2.";
+            rc += Environment.NewLine;
+            rc += "   (--c ...) means parameter c is optional. --c 1 (2) means argument 2 is optional";
+            rc += Environment.NewLine;
+
             return rc;
         }
 
@@ -224,10 +232,6 @@ namespace AwsDotNetS3LargeFileXferCmd
                 rc = Param.BucketRegion;
             else if (param == BucketNameParam)
                 rc = Param.BucketName;
-            else if (param == InputFileParam)
-                rc = Param.InputFile;
-            else if (param == OutputFileParam)
-                rc = Param.OutputFile;
             else if (param == HelpParam)
                 rc = Param.Help;
             else

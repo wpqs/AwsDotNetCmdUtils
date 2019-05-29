@@ -4,7 +4,13 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <LangVersion>7.1</LangVersion>
-    <Version>1.0.30.1</Version>
+    <Version>1.0.30.2</Version>
+    <Authors>Will Stott</Authors>
+    <Company>Maximodex Limited</Company>
+    <Copyright>Will Stott</Copyright>
+    <PackageLicenseUrl>https://github.com/wpqs/AwsDotNetCmdUtils/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/wpqs/AwsDotNetCmdUtils</PackageProjectUrl>
+    <Description>Transfers large files to and from S3 storage</Description>
   </PropertyGroup>
 
   <ItemGroup>
