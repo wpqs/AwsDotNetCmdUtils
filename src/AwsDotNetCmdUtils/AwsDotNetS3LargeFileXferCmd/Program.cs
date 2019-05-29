@@ -109,7 +109,9 @@ namespace AwsDotNetS3LargeFileXferCmd
                     Key = Path.GetFileName(cmdLineParams.OutputFile)
                 };
 
+                Console.Write($"downloading {cmdLineParams.OutputFile} from {cmdLineParams.BucketName}...");
                 await fileTransferUtility.DownloadAsync(fileTransferRequest);
+                Console.WriteLine("...done.");
             }
             catch (Exception e)
             {
@@ -137,7 +139,9 @@ namespace AwsDotNetS3LargeFileXferCmd
                     };
                     var fileTransferUtility = new TransferUtility(s3Client, config);
 
+                    Console.Write($"uploading {cmdLineParams.InputFile} to {cmdLineParams.BucketName}...");
                     await fileTransferUtility.UploadAsync(cmdLineParams.InputFile, cmdLineParams.BucketName);
+                    Console.WriteLine("...done.");
                 }
             }
             catch (Exception e)
