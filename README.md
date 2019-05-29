@@ -6,7 +6,7 @@ Collection of .NET command line utilities for Amazon Web Services:
 Installation on host computer
 =============================
 1. .NET Core 2.2 - download runtime 2.2.5 from https://dotnet.microsoft.com/download/dotnet-core/2.2
-2. AwsDotNetCmdUtils - download [release ZIP](https://github.com/wpqs/AwsDotNetCmdUtils/tree/master/src/AwsDotNetCmdUtils/releases) file from GitHub and extract to a suitable directory on your PC - i.e. C:\Program Files\WPQS\AwsDotNetCmdUtils
+2. AwsDotNetCmdUtils - download [release ZIP](https://github.com/wpqs/AwsDotNetCmdUtils/tree/master/src/AwsDotNetCmdUtils/AwsDotNetS3LargeFileXferCmd/releases) file from GitHub and extract to a suitable directory on your PC - i.e. C:\Program Files\WPQS\AwsDotNetCmdUtils
 3. AWS CLI - download the Amazon CLI for Windows (64-bit) from https://docs.aws.amazon.com/cli/latest/userguide/install-windows.html
 4. Create a test file called largefile.bin (500MB) in a suitable directory on your PC - i.e. c:\users\wills\
 	fsutil file createnew largefile.bin 524288000
