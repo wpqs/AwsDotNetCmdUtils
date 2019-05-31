@@ -1,0 +1,56 @@
+Todo: AwsDotNetCmdUtils
+=======================
+
+AwsDotNetS3LargeFileXferCmd
+---------------------------
+
+--operation download
+   check folder exists
+   fail if file exists
+
+--operation download overwrite
+   overwrite rather than fail if file exists
+
+--operation uploadfolder c:\users\wills\folder --bucketfolder S3foldername
+   list all files and CRC64
+   foreach file
+     upload to S3foldername
+	 update filelog.txt
+   upload filelog.txt to S3foldername
+  
+
+--operation uploadfolder changed c:\users\wills\folder --bucketfolder S3foldername
+   list all files and CRC64
+   compare with filelog.txt
+   foreach changed file
+     upload to S3foldername
+	 update filelog.txt
+   upload filelog.txt
+
+--operation downloadfolder c:\users\wills\folder\filelog.txt 
+   download filelog.txt into temp dir
+   foreach file
+     download to c:\users\wills\folder (unless it exists, or if overwrite specified)
+   merge filelog.txt  
+
+--operation downloadfolder changed c:\users\wills\folder\filelog.txt 
+   list all files and CRC64
+   download filelog.txt into temp dir
+   foreach changed file
+     download to c:\users\wills\folder (unless it exists, or if overwrite specified)
+   update filelog.txt
+
+--operation uploadfolder c:\users\wills\folder all
+   same as above, but include subdirectories
+
+--operation uploadfolder c:\users\wills\folder encrypt keyname
+   same as above, but encrypt files before upload
+
+--operation downloadfolder c:\users\wills\folder\filelog.txt decrypt keyname 
+   same as above, but decrypt files after download
+
+--operation uploadzip c:\users\wills\folder compress
+   same as above, but compress files into a single ZIP before upload
+
+--operation downloadzip c:\users\wills\folder\file.zip decompress 
+   same as above, but decompress files after download

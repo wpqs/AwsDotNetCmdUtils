@@ -1,0 +1,9 @@
+AwsResCmds - CLI command needed to create resources for AwsDotNetCmdUtils
+=========================================================================
+
+AwsDotNetS3LargeFileXferCmd
+---------------------------
+
+Create AIM and record keys
+Create bucket and set its properties (version, etc) as well as lifecycle rules (transition, delete, etc)
+

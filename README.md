@@ -11,27 +11,45 @@ Installation on host computer
 4. Create a test file called largefile.bin (500MB) in a suitable directory on your PC - i.e. c:\users\wills\
 	fsutil file createnew largefile.bin 524288000
 
+Utilities
+=========
+
 AwsDotNetS3LargeFileXferCmd
-===========================
+----------------------------
 Transfers large files to and from S3 storage.
 
-Run Information
----------------
+Setup
 
-1. use the ASW console ( https://console.aws.amazon.com/console) to create a S3 bucket and record 
+1. use the ASW console ( https://console.aws.amazon.com/console) to create a S3 bucket and record - see AwsResCmds.txt
 	bucket name (novastor-nuc-test), region name (us-east-1)
 	record key and secret key needed to access it (best to create AIM keys rather than use root keys)
 2. open a Command Prompt window and issue the following commands:
   * cd c:\users\wills
   * aws config
      (enter region name and keys when prompted)
-  * dotnet "C:\Program Files\WPQS\AwsDotNetCmdUtils\AwsDotNetS3LargeFileXferCmd.dll" --help
-  * dotnet "C:\Program Files\WPQS\AwsDotNetCmdUtils\AwsDotNetS3LargeFileXferCmd.dll" --bucketregion us-east-1 --bucketname novastor-nuc-test --operation upload c:\users\wills\largefile.bin
-  * dotnet "C:\Program Files\WPQS\AwsDotNetCmdUtils\AwsDotNetS3LargeFileXferCmd.dll" --bucketregion us-east-1 --bucketname novastor-nuc-test --operation download c:\users\wills\largefile.bin
+  * enter commands - see below
+
+Commands
+
+  * Display help
+
+       dotnet "C:\Program Files\WPQS\AwsDotNetCmdUtils\AwsDotNetS3LargeFileXferCmd.dll" --help
+
+  * Upload single file c:\users\wills\largefile.bin to bucket novastor-nuc-test in us-east-1
+
+       dotnet "C:\Program Files\WPQS\AwsDotNetCmdUtils\AwsDotNetS3LargeFileXferCmd.dll" --bucketregion us-east-1 --bucketname novastor-nuc-test --operation upload c:\users\wills\largefile.bin
+
+  * Download single file largefile.bin from bucket novastor-nuc-test in us-east-1 to c:\users\wills\largefile.bin
+
+       dotnet "C:\Program Files\WPQS\AwsDotNetCmdUtils\AwsDotNetS3LargeFileXferCmd.dll" --bucketregion us-east-1 --bucketname novastor-nuc-test --operation download c:\users\wills\largefile.bin
+
+Notes
+
+  * Performance may be improved by changing the default values for --threads and --partialsize
 
 
 Build Information
------------------
+=================
 
 Development Platform
   Visual Studio 2017, 15.9.7
