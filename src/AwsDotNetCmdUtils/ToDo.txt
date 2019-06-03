@@ -4,12 +4,7 @@ Todo: AwsDotNetCmdUtils
 AwsDotNetS3LargeFileXferCmd
 ---------------------------
 
---operation download
-   check folder exists
-   fail if file exists
-
---operation download overwrite
-   overwrite rather than fail if file exists
+refactor GetArgValue()
 
 --operation uploadfolder c:\users\wills\folder --bucketfolder S3foldername
    list all files and CRC64
@@ -17,7 +12,6 @@ AwsDotNetS3LargeFileXferCmd
      upload to S3foldername
 	 update filelog.txt
    upload filelog.txt to S3foldername
-  
 
 --operation uploadfolder changed c:\users\wills\folder --bucketfolder S3foldername
    list all files and CRC64
@@ -30,15 +24,27 @@ AwsDotNetS3LargeFileXferCmd
 --operation downloadfolder c:\users\wills\folder\filelog.txt 
    download filelog.txt into temp dir
    foreach file
-     download to c:\users\wills\folder (unless it exists, or if overwrite specified)
+     download to c:\users\wills\folder 
    merge filelog.txt  
 
 --operation downloadfolder changed c:\users\wills\folder\filelog.txt 
-   list all files and CRC64
    download filelog.txt into temp dir
+   list all files and CRC64
+   compare filelog.txt
    foreach changed file
-     download to c:\users\wills\folder (unless it exists, or if overwrite specified)
-   update filelog.txt
+     download to c:\users\wills\folder 
+   update filelog.txt (local)
+
+--operation syncfolder c:\users\wills\folder\filelog.txt 
+   download filelog.txt into temp dir
+   list all files and CRC64
+   compare filelog.txt
+   foreach any changed file, or file not present S3
+     upload to S3 folder (version enabled)
+   foreach any file not present locally
+     download to c:\users\wills\folder 
+   update filelog.txt (local)
+   upload filelog.txt
 
 --operation uploadfolder c:\users\wills\folder all
    same as above, but include subdirectories

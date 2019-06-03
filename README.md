@@ -8,8 +8,9 @@ Installation on host computer
 1. .NET Core 2.2 - download runtime 2.2.5 from https://dotnet.microsoft.com/download/dotnet-core/2.2
 2. AwsDotNetCmdUtils - download latest [release ZIP](https://github.com/wpqs/AwsDotNetCmdUtils/releases) file from GitHub and extract to a suitable directory on your PC - i.e. C:\Program Files\WPQS\AwsDotNetCmdUtils
 3. AWS CLI - download the Amazon CLI for Windows (64-bit) from https://docs.aws.amazon.com/cli/latest/userguide/install-windows.html
-4. Create a test file called largefile.bin (500MB) in a suitable directory on your PC - i.e. c:\users\wills\
+4. Create a test file called 'large file.bin' (500MB) in a suitable directory on your PC - i.e. 'c:\users\wills\Aws Test'
 	fsutil file createnew largefile.bin 524288000
+	ren largefile.bin "large file.bin"
 
 Utilities
 =========
@@ -24,7 +25,7 @@ Setup
 	bucket name (novastor-nuc-test), region name (us-east-1)
 	record key and secret key needed to access it (best to create AIM keys rather than use root keys)
 2. open a Command Prompt window and issue the following commands:
-  * cd c:\users\wills
+  * cd "c:\users\wills\Aws Test"
   * aws config
      (enter region name and keys when prompted)
   * enter commands - see below
@@ -37,16 +38,28 @@ Commands
 
   * Upload single file c:\users\wills\largefile.bin to bucket novastor-nuc-test in us-east-1
 
-       dotnet "C:\Program Files\WPQS\AwsDotNetCmdUtils\AwsDotNetS3LargeFileXferCmd.dll" --bucketregion us-east-1 --bucketname novastor-nuc-test --operation upload c:\users\wills\largefile.bin
+       dotnet "C:\Program Files\WPQS\AwsDotNetCmdUtils\AwsDotNetS3LargeFileXferCmd.dll" --bucketregion eu-west-2 --bucketname novastor-test-0 --operation upload 'c:\users\wills\Aws Test\large file.bin'
 
-  * Download single file largefile.bin from bucket novastor-nuc-test in us-east-1 to c:\users\wills\largefile.bin
+  * Download single file large file.bin from bucket novastor-nuc-test in us-east-1 to c:\users\wills\largefile.bin
 
-       dotnet "C:\Program Files\WPQS\AwsDotNetCmdUtils\AwsDotNetS3LargeFileXferCmd.dll" --bucketregion us-east-1 --bucketname novastor-nuc-test --operation download c:\users\wills\largefile.bin
+       dotnet "C:\Program Files\WPQS\AwsDotNetCmdUtils\AwsDotNetS3LargeFileXferCmd.dll" --bucketregion eu-west-2 --bucketname novastor-test-0 --operation download 'c:\users\wills\Aws Test\large file.bin' overwrite
 
 Notes
 
   * Performance may be improved by changing the default values for --threads and --partialsize
 
+
+Build History
+=============
+   * v1.1.30.0
+       * initial release basic upload and download facilities for S3 bucket
+
+   * v1.1.32.0
+       * improvements to UI and bug fixes
+	   * implemented quotes so spaces can exist in filename
+       * added parameters for setting changing default threads and partialsize as well as overwrite option for download 
+	   * download checks folder exists and will fail if file exists (unless overwrite specified)
+	   * unit tests for CmdLineParams
 
 Build Information
 =================

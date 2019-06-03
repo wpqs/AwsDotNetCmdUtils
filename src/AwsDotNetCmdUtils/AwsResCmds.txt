@@ -7,3 +7,25 @@ AwsDotNetS3LargeFileXferCmd
 Create AIM and record keys
 Create bucket and set its properties (version, etc) as well as lifecycle rules (transition, delete, etc)
 
+
+Publish
+-------
+
+Update version
+Update README.md - changes
+Build - no errors
+Pass unit tests
+Publish
+Copy LICENSE to publish directory
+ZIP publish direction
+copy ZIP to AwsDotNetS3LargeFileXferCmd\releases
+Extract ZIP to C:\Program Files\WPQS\AwsDotNetCmdUtils
+Pass Functional tests
+  dotnet "C:\Program Files\WPQS\AwsDotNetCmdUtils\AwsDotNetS3LargeFileXferCmd.dll" --Help
+  dotnet "C:\Program Files\WPQS\AwsDotNetCmdUtils\AwsDotNetS3LargeFileXferCmd.dll" --bucketregion eu-west-2 --bucketname novastor-test-0 --operation upload 'c:\users\wills\Aws Test\large file.bin'
+  dotnet "C:\Program Files\WPQS\AwsDotNetCmdUtils\AwsDotNetS3LargeFileXferCmd.dll" --bucketregion eu-west-2 --bucketname novastor-test-0 --operation download 'c:\users\wills\Aws Test\large file.bin' overwrite
+Check-in to GitHub
+Create release
+Upload ZIP
+
+
