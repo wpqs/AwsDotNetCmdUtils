@@ -6,7 +6,7 @@ namespace AwsDotNetS3LargeFileXferTest
 {
     public class CmdLineParamTest
     {
-        public static readonly string[] StdParamsHelp = { "--help" };
+        public static readonly string[] StdParamsHelp = { "--Help" };
 
         private readonly string[] StdParamsEndSpace = { "--operation ", "upload", "c:\\users\\wills\\largefile.bin", "--bucketregion  ", "us-west-1", "--bucketname ", "test" };
         private readonly string[] StdParamsStartSpace = { " --operation", "upload", "c:\\users\\wills\\largefile.bin", " --bucketregion", "us-west-1", " --bucketname ", "test" };
@@ -25,6 +25,7 @@ namespace AwsDotNetS3LargeFileXferTest
         private readonly string[] StdParamsFilenameSpaceQuotesStartEndSpace = { "--operation", "upload", " 'c:\\users\\wills\\dot space\\largefile.bin'  ", "--bucketregion", "us-west-1", "--bucketname", "test" };
         private readonly string[] StdParamsFilenameEmptyQuotes = { "--operation", "upload", "''", "--bucketregion", "us-west-1", "--bucketname", "test" };
         private readonly string[] StdParamsFilenameNoClosingQuote = { "--operation", "upload", "'c:\\users\\wills\\dot space\\largefile.bin", "--bucketregion", "us-west-1", "--bucketname", "test" };
+        private readonly string[] StdParamsFilenameJustOpeningQuote = { "--operation", "upload", "'", "--bucketregion", "us-west-1", "--bucketname", "test" };
 
 
         [Fact]
@@ -268,6 +269,15 @@ namespace AwsDotNetS3LargeFileXferTest
 
             Assert.True(cmdLine.IsError);
             Assert.StartsWith("Error: Invalid argument 2 in \"--operation upload 'c:\\users\\wills\\dot space\\largefile.bin\" - no closing quote character", cmdLine.GetErrorMsg());
+        }
+
+        [Fact]
+        public void TestStdParamsFilenameJustOpeningQuote()
+        {
+            var cmdLine = new CmdLineParamsApp(StdParamsFilenameJustOpeningQuote);
+
+            Assert.True(cmdLine.IsError);
+            Assert.StartsWith("Error: Invalid argument 2 in \"--operation upload '\" - no closing quote character", cmdLine.GetErrorMsg());
         }
     }
 }

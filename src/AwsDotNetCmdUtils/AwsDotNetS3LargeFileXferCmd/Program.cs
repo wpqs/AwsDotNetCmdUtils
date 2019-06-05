@@ -50,7 +50,7 @@ namespace AwsDotNetS3LargeFileXferCmd
             return rc;
         }
 
-        private static string GetVersion()
+        public static string GetVersion()
         {
             string rc = "v";
 

@@ -51,15 +51,17 @@ Notes
 
 Build History
 =============
-   * v1.1.30.0
-       * initial release basic upload and download facilities for S3 bucket
 
+   * v1.1.32.1
+       * improvement to UI refactor GetArgValue()
    * v1.1.32.0
        * improvements to UI and bug fixes
 	   * implemented quotes so spaces can exist in filename
        * added parameters for setting changing default threads and partialsize as well as overwrite option for download 
 	   * download checks folder exists and will fail if file exists (unless overwrite specified)
 	   * unit tests for CmdLineParams
+   * v1.1.30.0
+       * initial release basic upload and download facilities for S3 bucket
 
 Build Information
 =================

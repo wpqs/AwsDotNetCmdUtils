@@ -4,7 +4,7 @@ Todo: AwsDotNetCmdUtils
 AwsDotNetS3LargeFileXferCmd
 ---------------------------
 
-refactor GetArgValue()
+Refactor CmdLineParamTest to use ScaffoldApp rather than CmdLineParamsApp
 
 --operation uploadfolder c:\users\wills\folder --bucketfolder S3foldername
    list all files and CRC64

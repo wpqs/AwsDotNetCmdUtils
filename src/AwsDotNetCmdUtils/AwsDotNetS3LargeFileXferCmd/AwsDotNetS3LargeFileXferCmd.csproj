@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <LangVersion>7.1</LangVersion>
-    <Version>1.1.32.0</Version>
+    <Version>1.1.32.1</Version>
     <Authors>Will Stott</Authors>
     <Company>Maximodex Limited</Company>
     <Copyright>Will Stott</Copyright>

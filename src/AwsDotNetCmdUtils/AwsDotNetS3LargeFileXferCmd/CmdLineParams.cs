@@ -54,61 +54,73 @@ namespace AwsDotNetS3LargeFileXferCmd
         protected string GetArgValue(string paramLine, int argNumber=1)
         {
             string rc = null;
-            if (paramLine != null)
+            if (paramLine == null)
+                SetErrorMsg($"Error: Program bug - please report this problem with details: AwsDotNetS3LargeFileXferCmd {Program.GetVersion()} - GetArgValue() paramLine=[null]");
+            else
             {
-                bool firstQuote = false;
-                char breakChar = spaceChar;
-                int count = 1;
-                int offset = 0;
-                while ((offset = paramLine.IndexOf(breakChar, offset)) != -1)
+                int count = 1;  
+                var offsetArgEnd = 0;
+                while (offsetArgEnd < paramLine.Length)
                 {
-                    if ((count == argNumber) && (paramLine.Length > offset + 1))
+                    var offsetArgStart = 0;
+                    if ((offsetArgStart = paramLine.IndexOf(spaceChar, offsetArgEnd)) == -1)
+                        break;
+                    while (paramLine[offsetArgStart] == spaceChar)
+                        offsetArgStart++;
+                    if ((offsetArgEnd = GetEndArgOffset(paramLine, offsetArgStart)) == -1)
                     {
-                        var argument = paramLine.Substring(offset + 1).TrimStart();
-                        if (argument.StartsWith(quoteChar) == false)
+                        SetErrorMsg($"Error: Invalid argument {argNumber} in \"{paramLine}\" - no closing quote character {Environment.NewLine}{GetParamHelp()}");
+                        break;
+                    }
+                    if (count++ == argNumber)
+                    {
+                        if ((offsetArgEnd - offsetArgStart + 1) <= 0)
                         {
-                            var end = argument.IndexOf(spaceChar);
-                            if (end != -1) 
-                                argument = argument.Substring(0, end);
-                            rc = argument.TrimEnd();
+                            SetErrorMsg($"Error: Program bug - please report this problem with details: AwsDotNetS3LargeFileXferCmd {Program.GetVersion()} - GetArgValue() offsetArgEnd={offsetArgEnd}, offsetArgStart={offsetArgStart}");
+                            break;
                         }
+                        var argument = paramLine.Substring(offsetArgStart, offsetArgEnd - offsetArgStart + 1);
+                        if (argument[0] != quoteChar)
+                            rc = argument;
                         else
                         {
-                            var end = argument.IndexOf(quoteChar, 1);
-                            if (end == -1)
-                                SetErrorMsg($"Error: Invalid argument {argNumber} in \"{paramLine}\" - no closing quote character {Environment.NewLine}{GetParamHelp()}");
+                            if (argument.Length < 3)
+                                SetErrorMsg($"Error: Invalid argument {argNumber} in \"{paramLine}\" - nothing between the quotes {Environment.NewLine}{GetParamHelp()}");
                             else
-                            {
-                                argument = argument.Substring(1, end-1);
-                                if (argument.Length < 1)
-                                    SetErrorMsg($"Error: Invalid argument {argNumber} in \"{paramLine}\" - nothing between the quotes {Environment.NewLine}{GetParamHelp()}");
-                                else
-                                    rc = argument.TrimEnd();
-                            }
+                                rc = argument.Substring(1, argument.Length - 2);
                         }
                         break;
                     }
-                    while (paramLine[offset] == spaceChar) 
-                        offset++;
-                    if ((paramLine[offset] != quoteChar) || (offset + 1 >= paramLine.Length))
-                    {
-                        breakChar = spaceChar;
-                        count++;
-                    }
+                    offsetArgEnd++;
+                }
+            }
+            return rc;
+        }
+
+        private int GetEndArgOffset(string paramLine, int offsetArgStart)
+        {
+            int rc = -1;
+
+            if ((offsetArgStart <= 0) || (paramLine == null) || (offsetArgStart >= paramLine.Length))
+                SetErrorMsg($"Error: Program bug - please report this problem with details: AwsDotNetS3LargeFileXferCmd {Program.GetVersion()} - GetEndArg() paramLine=\"{paramLine ?? "[null]"}\" offsetArgStart={offsetArgStart}");
+            else
+            {
+                var offset = -1;
+                if (paramLine[offsetArgStart] != quoteChar)
+                {
+                    offset = paramLine.IndexOf(spaceChar, offsetArgStart);
+                    if (offset == -1)
+                        rc = paramLine.Length - 1;
                     else
+                        rc = offset - 1;
+                }
+                else
+                {
+                    if (offsetArgStart + 1 < paramLine.Length)
                     {
-                        if (firstQuote == true)
-                        {
-                            breakChar = spaceChar;
-                            count++;
-                            firstQuote = false;
-                        }
-                        else
-                        {
-                            breakChar = quoteChar;
-                            firstQuote = true;
-                        }
-                        offset++;
+                        offset = paramLine.IndexOf(quoteChar, offsetArgStart + 1);
+                        if (offset >= 0)
+                            rc = offset;
                     }
                 }
             }
