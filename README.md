@@ -36,11 +36,11 @@ Commands
 
        dotnet "C:\Program Files\WPQS\AwsDotNetCmdUtils\AwsDotNetS3LargeFileXferCmd.dll" --help
 
-  * Upload single file c:\users\wills\largefile.bin to bucket novastor-nuc-test in us-east-1
+  * Upload single file c:\users\wills\largefile.bin to bucket novastor-test-0 in eu-west-2
 
        dotnet "C:\Program Files\WPQS\AwsDotNetCmdUtils\AwsDotNetS3LargeFileXferCmd.dll" --bucketregion eu-west-2 --bucketname novastor-test-0 --operation upload 'c:\users\wills\Aws Test\large file.bin'
 
-  * Download single file large file.bin from bucket novastor-nuc-test in us-east-1 to c:\users\wills\largefile.bin
+  * Download single file large file.bin from bucket nbucket novastor-test-0 in eu-west-2 to c:\users\wills\largefile.bin
 
        dotnet "C:\Program Files\WPQS\AwsDotNetCmdUtils\AwsDotNetS3LargeFileXferCmd.dll" --bucketregion eu-west-2 --bucketname novastor-test-0 --operation download 'c:\users\wills\Aws Test\large file.bin' overwrite
 
