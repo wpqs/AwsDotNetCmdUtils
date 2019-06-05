@@ -8,12 +8,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{37E5D0A0-A
 		AwsResCmds.txt = AwsResCmds.txt
 		..\..\LICENSE = ..\..\LICENSE
 		..\..\README.md = ..\..\README.md
+		SampleCmds.txt = SampleCmds.txt
 		ToDo.txt = ToDo.txt
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AwsDotNetS3LargeFileXferCmd", "AwsDotNetS3LargeFileXferCmd\AwsDotNetS3LargeFileXferCmd.csproj", "{1A4739F8-4811-45C8-B4CC-61E15B28BBE5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AwsDotNetS3LargeFileXferTest", "AwsDotNetS3LargeFileXferTest\AwsDotNetS3LargeFileXferTest.csproj", "{CB788AF5-25D9-4775-8D11-8A420F360C8D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AwsDotNetS3LargeFileXferTest", "AwsDotNetS3LargeFileXferTest\AwsDotNetS3LargeFileXferTest.csproj", "{CB788AF5-25D9-4775-8D11-8A420F360C8D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

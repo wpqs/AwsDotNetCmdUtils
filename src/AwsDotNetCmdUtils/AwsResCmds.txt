@@ -16,7 +16,7 @@ Update README.md - changes
 Build - no errors
 Pass unit tests
 Publish
-Copy LICENSE to publish directory
+Copy LICENSE and SampleCmds.txt to publish directory
 ZIP publish direction AwsDotNetS3LargeFileXferCmd-x.x.xx.x.zip
 copy ZIP to AwsDotNetS3LargeFileXferCmd\releases
 Extract ZIP to C:\Program Files\WPQS\AwsDotNetCmdUtils

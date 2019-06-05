@@ -1,0 +1,6 @@
+
+dotnet "C:\Program Files\WPQS\AwsDotNetCmdUtils\AwsDotNetS3LargeFileXferCmd.dll" --help
+dotnet "C:\Program Files\WPQS\AwsDotNetCmdUtils\AwsDotNetS3LargeFileXferCmd.dll" --bucketregion us-east-1 --bucketname novastor-test-us --operation upload 'c:\users\wills\Aws Test\large file.bin'
+dotnet "C:\Program Files\WPQS\AwsDotNetCmdUtils\AwsDotNetS3LargeFileXferCmd.dll" --bucketregion eu-west-2 --bucketname novastor-test-0 --operation upload 'c:\users\wills\Aws Test\large file.bin'
+dotnet "C:\Program Files\WPQS\AwsDotNetCmdUtils\AwsDotNetS3LargeFileXferCmd.dll" --bucketregion eu-west-2 --bucketname novastor-test-0 --operation download 'c:\users\wills\Aws Test\large file.bin' overwrite
+
